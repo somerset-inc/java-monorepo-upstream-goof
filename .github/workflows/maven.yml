@@ -4,7 +4,13 @@
 name: Maven Build
 
 on:
+  push:
+    branches: ["master" ]
   pull_request:
+    branches: ["master"]
+  workflow_dispatch:
+  workflow_call:
+  
 
 jobs:
   maven-build:
@@ -38,3 +44,14 @@ jobs:
         env:
           MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true -Dmaven.wagon.http.retryHandler.count=2 -Dmaven.wagon.http.pool=true
         run: mvn --show-version --batch-mode -PskipBrokenTests test
+  security-open-source:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v2
+    - name: Run Snyk to check for vulnerabilities - Maven
+      uses: snyk/actions/setup@master
+    - run: snyk test --all-projects
+      continue-on-error: false
+      env:
+        SNYK_TOKEN: ${{secrets.SNYK_API_TOKEN}}
