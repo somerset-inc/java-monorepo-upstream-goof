@@ -1,0 +1,23 @@
+name: Snyk Security - Open Source
+
+on:
+  push:
+    branches: ["master" ]
+  pull_request:
+    branches: ["master"]
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  security-open-source:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v2
+    - name: Run Snyk to check for vulnerabilities - Maven
+      uses: snyk/actions/maven@master
+      continue-on-error: false
+      env:
+        SNYK_TOKEN: ${{secrets.SNYK_API_TOKEN}}
+      with:
+        command: test
